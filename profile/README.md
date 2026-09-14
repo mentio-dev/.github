@@ -35,11 +35,15 @@ mentio auth:login && mentio mentions:watch --platform reddit | jq -r '.post.url'
 | Platform | What arrives | How often |
 | --- | --- | --- |
 | Reddit | Posts, every subreddit, through the official API | every 30 minutes |
-| Hacker News | Stories and comments | continuous |
-| X | Posts and replies, with the parent post and follower count | hourly |
-| GitHub | Issues, discussions and pull requests that name the term | every 15 minutes |
-| Bluesky | The whole network, live | live firehose |
-| LinkedIn, Stack Overflow, DEV, YouTube, News | Posts, questions, articles, videos, press | hourly to twice a day |
+| Hacker News | Stories and comments | every hour |
+| X | Posts and replies, with the parent post and follower count | every hour |
+| GitHub | Issues and pull requests that name the term | every 15 minutes |
+| Bluesky | Posts, the whole network | live, within seconds |
+| LinkedIn | Public posts | every 3 hours |
+| Stack Overflow | Questions and answers | every hour |
+| DEV | Articles | every hour |
+| YouTube | Videos | twice a day |
+| News | Web articles | every 15 minutes |
 
 Every mention carries a relevance score, a sentiment, and intents: `buy_intent`, `question`, `complaint`, `praise`, `comparison`. Keywords can be restricted per platform.
 
