@@ -1,46 +1,72 @@
 # Mentio
 
-Social listening for developers. Mentio watches Reddit, Hacker News, X, GitHub,
-Bluesky, LinkedIn, Stack Overflow, DEV, YouTube and news for your keywords,
-scores every mention for relevance, sentiment and intent, and delivers the ones
-that matter to Slack, Telegram, email, a webhook, or straight into your AI
-agent. API and MCP first: the dashboard is one client of the same API.
+**Social listening for developers.** Mentio watches ten platforms for your keywords, scores every mention for relevance, sentiment and intent, and delivers the ones that matter to Slack, Telegram, email, a webhook, or straight into your AI agent. API and MCP first: the dashboard is one client of the same API.
 
-- **Website**: [mentio.dev](https://mentio.dev)
-- **Docs**: [docs.mentio.dev](https://docs.mentio.dev)
-- **Blog**: [mentio.dev/blog](https://mentio.dev/blog/)
+[mentio.dev](https://mentio.dev) · [Docs](https://docs.mentio.dev) · [API reference](https://docs.mentio.dev/api/keywords/create-keyword) · [Blog](https://mentio.dev/blog/) · [Dashboard](https://app.mentio.dev)
 
 ## Three ways in
 
 ```bash
-# Claude Code, Cursor, Codex, claude.ai, ChatGPT: one MCP server
+# An AI agent: Claude Code, Cursor, Codex, claude.ai, ChatGPT, one MCP server
 claude mcp add --transport http mentio https://mcp.mentio.dev/mcp
-
-# The command line
-npx @mentio-dev/cli auth:login && npx @mentio-dev/cli mentions:search --platform reddit
-
-# Any language: the REST API, described by one OpenAPI document
-curl -H "Authorization: Bearer $MENTIO_API_KEY" https://api.mentio.dev/v1/mentions
 ```
+
+```ts
+// TypeScript: npm install @mentio-dev/sdk
+import { createMentio } from '@mentio-dev/sdk';
+const mentio = createMentio({ apiKey: process.env.MENTIO_API_KEY! });
+const { data } = await mentio.searchMentions({ query: { platform: 'reddit', intent: 'buy_intent' }, throwOnError: true });
+```
+
+```python
+# Python: pip install mentio
+from mentio import Mentio
+for m in Mentio(api_key="mk_live_...").mentions.search(platform="reddit", intent="buy_intent").data:
+    print(m.classification.relevance, m.post.url)
+```
+
+```bash
+# The command line: npm i -g @mentio-dev/cli
+mentio auth:login && mentio mentions:watch --platform reddit | jq -r '.post.url'
+```
+
+## What it watches
+
+| Platform | What arrives | How often |
+| --- | --- | --- |
+| Reddit | Posts, every subreddit, through the official API | every 30 minutes |
+| Hacker News | Stories and comments | continuous |
+| X | Posts and replies, with the parent post and follower count | hourly |
+| GitHub | Issues, discussions and pull requests that name the term | every 15 minutes |
+| Bluesky | The whole network, live | live firehose |
+| LinkedIn, Stack Overflow, DEV, YouTube, News | Posts, questions, articles, videos, press | hourly to twice a day |
+
+Every mention carries a relevance score, a sentiment, and intents: `buy_intent`, `question`, `complaint`, `praise`, `comparison`. Keywords can be restricted per platform.
+
+## The API, in five areas
+
+Keywords · Mentions (search, triage, CSV export) · People (the authors behind the mentions, tags and merges) · Alerts and channels (instant rules and daily digests to Slack, Telegram, email, webhooks) · Analytics (summary, series, breakdown, share of voice). One [OpenAPI document](https://api.mentio.dev/v1/openapi.json), and every SDK below is generated from it on every release, so nothing is ever missing.
 
 ## Repositories
 
-| Repository | What it is |
-| --- | --- |
-| [sdk](https://github.com/mentio-dev/sdk) | TypeScript SDK, `npm i @mentio-dev/sdk`. Generated from the OpenAPI document on every release. |
-| [sdk-python](https://github.com/mentio-dev/sdk-python) | Python client, `pip install mentio`. Sync and async, typed. |
-| [cli](https://github.com/mentio-dev/cli) | `mentio` on the command line: one command per endpoint, a live mentions feed, MCP helpers. |
-| [claude-skills](https://github.com/mentio-dev/claude-skills) | Claude Code skills: the five-minute Reddit routine and the rules that keep it honest. |
-| [openclaw-skill](https://github.com/mentio-dev/openclaw-skill) | The Mentio skill for OpenClaw agents, published to ClawHub as `mentio`. |
+| Repository | What it is | Install |
+| --- | --- | --- |
+| [sdk](https://github.com/mentio-dev/sdk) | Official TypeScript SDK | `npm i @mentio-dev/sdk` |
+| [sdk-python](https://github.com/mentio-dev/sdk-python) | Official Python SDK, sync and async | `pip install mentio` |
+| [cli](https://github.com/mentio-dev/cli) | `mentio` on the command line, plus a live feed and MCP helpers | `npm i -g @mentio-dev/cli` |
+| [claude-skills](https://github.com/mentio-dev/claude-skills) | Claude Code skills: the five-minute Reddit routine and its rules | copy into `.claude/skills/` |
+| [openclaw-skill](https://github.com/mentio-dev/openclaw-skill) | The skill for OpenClaw agents | `npx clawhub@latest install mentio` |
 
-The SDKs, the CLI and the skill reference are generated from the API, so they
-are always complete; these repositories are published from the main codebase
-on every release. Issues are welcome on any of them.
+Issues are welcome on any of them.
+
+## Latest from the blog
+
+- [Twitter keyword alerts in 2026: what still works on X](https://mentio.dev/blog/twitter-keyword-alerts/)
+- [Reddit API pricing in 2026: is it free, what it costs, who gets access](https://mentio.dev/blog/reddit-api-pricing/)
+- [How to find customers on Reddit with Claude Code](https://mentio.dev/blog/find-customers-on-reddit/)
 
 ## Pricing, in one line
 
-$5 per keyword per month and $0.008 per matched mention, from a prepaid
-balance. No plan, no seat, no tier. Every account starts with $5.80 of credit.
+$5 per keyword per month and $0.008 per matched mention, from a prepaid balance. No plan, no seat, no tier. Every account starts with $5.80 of credit, no card.
 
-Built on Cloudflare Workers, Queues, D1 and Durable Objects. Made by
-[Pau](https://x.com/pauguirao).
+Built on Cloudflare Workers, Queues, D1 and Durable Objects. Made by [Pau](https://x.com/pauguirao).
